@@ -67,7 +67,9 @@ and of course, copy/move `piremote.py` to your home folder:
 ## To record a button from a remote:
 `ir-ctl --device=/dev/lirc1 --record=button.txt`
 
-remember to change `/dev/lirc1` with your actual receiver (could also be lirc0 - check with `ir-ctl --device=/dev/lirc1 --features`)
+remember to change `/dev/lirc1` with your actual receiver 
+
+(could also be lirc0 - check with `ir-ctl --device=/dev/lirc1 --features`)
 
 ## To send a button:
 `ir-ctl --send=button.txt`
