@@ -1,5 +1,7 @@
 # pIRemote
-IR universal remote using a Raspberry Pi 
+IR universal remote using a Raspberry Pi - connect that to a Google Home or Amazon Alexa and you're good to go!
+
+It's more of a gist as of now, but I'll automate the process where possible.
 
 # Hardware Requirements 
 IR emitter and receiver(s): https://amzn.to/2InADWe
@@ -14,7 +16,7 @@ Install lirc: `sudo apt-get install lirc`
 Add the following to your `/etc/modules`:
 ```
 lirc_dev
-lirc_rpi gpio_in_pin=23 gpio_out_pin=22
+lirc_rpi gpio_in_pin=27 gpio_out_pin=14
 ```
 Remember to change `gpio_in_pin` and `gpio_out_pin` according to your hardware setup
 
@@ -34,15 +36,40 @@ LIRCMD_CONF=""
 ```
 Add the following to your `/boot/config.txt`:
 ```
-dtoverlay=gpio-ir,gpio_pin=23
-dtoverlay=gpio-ir-tx,gpio_pin=22
+dtoverlay=gpio-ir,gpio_pin=27
+dtoverlay=gpio-ir-tx,gpio_pin=14
 ```
+
+create your `/etc/systemd/system/piremote.service` like so:
+```
+[Unit]
+Description=Pi remote service
+After=network.target 
+
+[Service]
+Type=idle
+User=pi
+Group=pi
+EnvironmentFile=/home/pi/.profile
+ExecStart=/bin/bash -l -c '/home/pi/piremote.py'
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=control-group
+
+[Install]
+WantedBy=multi-user.target
+```
+and of course, copy/move `piremote.py` to your home folder: 
+
+`cp piremote.py /home/pi/piremote.py`
 
 # Initial Configuration:
 
 ## To record a button from a remote:
 `ir-ctl --device=/dev/lirc1 --record=button.txt`
-remember to change `/dev/lirc1` with your actual receiver (check with `ir-ctl --features`)
+
+remember to change `/dev/lirc1` with your actual receiver (could also be lirc0 - check with `ir-ctl --device=/dev/lirc1 --features`)
 
 ## To send a button:
 `ir-ctl --send=button.txt`
+
+
